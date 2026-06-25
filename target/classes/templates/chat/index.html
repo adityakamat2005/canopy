@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${document.originalName} + ' — Canopy'">Chat — Canopy</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+</head>
+<body style="overflow:hidden">
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a href="/dashboard" class="navbar-brand">
+    <div class="navbar-logo">
+      <svg width="36" height="36" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="80" height="80" rx="20" fill="#DCFCE7"/>
+        <path d="M22 54 L40 18 L58 54 Z" fill="#BBF7D0" stroke="#16A34A" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M26 46 L40 22 L54 46 Z" fill="#DCFCE7" stroke="#15803D" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M30 38 L40 26 L50 38 Z" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5" stroke-linejoin="round"/>
+        <rect x="36" y="54" width="8" height="10" rx="2" fill="#16A34A"/>
+        <rect x="28" y="42" width="6" height="4" rx="1" fill="#fff" opacity="0.6"/>
+        <rect x="46" y="42" width="6" height="4" rx="1" fill="#fff" opacity="0.6"/>
+        <rect x="32" y="50" width="5" height="3" rx="1" fill="#fff" opacity="0.5"/>
+        <rect x="43" y="50" width="5" height="3" rx="1" fill="#fff" opacity="0.5"/>
+      </svg>
+    </div>
+    Canopy
+  </a>
+  <div class="navbar-nav">
+    <a href="/dashboard" class="nav-link"><i class="ti ti-arrow-left"></i> Dashboard</a>
+    <a href="/upload" class="nav-link"><i class="ti ti-upload"></i> Upload</a>
+    <div class="nav-user">
+      <div class="nav-avatar" th:text="${#strings.substring(user.name, 0, 2).toUpperCase()}">AD</div>
+      <span class="nav-name" th:text="${user.name}">Aditya</span>
+    </div>
+  </div>
+</nav>
+
+<input type="hidden" id="documentId" th:value="${document.id}"/>
+
+<div class="chat-layout">
+
+  <!-- Sidebar -->
+  <div class="chat-sidebar">
+    <div class="sidebar-header">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div class="doc-icon doc-icon-pdf" th:classappend="${document.fileType == 'PDF'} ? '' : (${document.fileType == 'DOCX'} ? 'doc-icon-docx' : 'doc-icon-txt')" style="width:32px;height:32px;font-size:0.9rem">
+          <i class="ti" th:classappend="${document.fileType == 'PDF'} ? 'ti-file-type-pdf' : (${document.fileType == 'DOCX'} ? 'ti-file-type-docx' : 'ti-file-text')"></i>
+        </div>
+        <div>
+          <div class="doc-info-title" th:text="${document.originalName}">document.pdf</div>
+          <div class="doc-info-meta" th:text="${document.chunkCount} + ' chunks indexed'">12 chunks</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-green" th:text="${document.fileType}">PDF</span>
+        <span class="badge badge-gray" th:text="${document.questionCount} + ' Q&amp;As'">0 Q&As</span>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="sidebar-section" style="border-bottom:1px solid var(--border)">
+      <div class="sidebar-section-title"><i class="ti ti-sparkles" style="font-size:10px"></i> AI Summary</div>
+      <div class="summary-text" th:text="${document.summary != null ? document.summary : 'Summary not available.'}">Summary...</div>
+    </div>
+
+    <!-- Suggested questions -->
+    <div class="sidebar-section" th:if="${suggestions != null and !#lists.isEmpty(suggestions)}">
+      <div class="sidebar-section-title"><i class="ti ti-bulb" style="font-size:10px"></i> Suggested questions</div>
+      <div th:each="q : ${suggestions}">
+        <button class="suggestion-btn" th:data-question="${q}" th:text="${q}">Question?</button>
+      </div>
+    </div>
+
+    <!-- Back -->
+    <div style="margin-top:auto;padding:1rem 1.25rem;border-top:1px solid var(--border)">
+      <a href="/dashboard" class="btn btn-secondary w-full" style="justify-content:center;font-size:0.8rem">
+        <i class="ti ti-arrow-left"></i> Back to documents
+      </a>
+    </div>
+  </div>
+
+  <!-- Chat main -->
+  <div class="chat-main">
+    <div class="chat-messages" id="chatMessages">
+
+      <!-- Welcome message -->
+      <div class="message assistant">
+        <div class="message-avatar">AI</div>
+        <div class="message-bubble">
+          <div>
+            Hi! I've read and indexed <strong th:text="${document.originalName}">your document</strong>.<br>
+            Ask me anything about it — I'll answer based on the document content and show you exactly where the information came from.
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat history -->
+      <div th:each="msg : ${history}">
+        <div class="message user" style="margin-bottom:8px">
+          <div class="message-avatar">You</div>
+          <div class="message-bubble" th:text="${msg.question}">Question</div>
+        </div>
+        <div class="message assistant">
+          <div class="message-avatar">AI</div>
+          <div class="message-bubble" th:text="${msg.answer}">Answer</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Input area -->
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <textarea
+          id="chatInput"
+          class="chat-input"
+          placeholder="Ask anything about this document... (Enter to send, Shift+Enter for new line)"
+          rows="1"
+        ></textarea>
+        <button id="sendBtn" class="send-btn" aria-label="Send message">
+          <i class="ti ti-send"></i>
+        </button>
+      </div>
+      <div style="font-size:0.7rem;color:var(--text-muted);margin-top:6px;text-align:center">
+        <i class="ti ti-shield-check" style="font-size:10px"></i>
+        Answers are grounded in your document. Canopy cites sources for every response.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

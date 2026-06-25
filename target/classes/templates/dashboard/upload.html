@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload — Canopy</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/dashboard" class="navbar-brand">
+    <div class="navbar-logo">
+      <svg width="36" height="36" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="80" height="80" rx="20" fill="#DCFCE7"/>
+        <path d="M22 54 L40 18 L58 54 Z" fill="#BBF7D0" stroke="#16A34A" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M26 46 L40 22 L54 46 Z" fill="#DCFCE7" stroke="#15803D" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M30 38 L40 26 L50 38 Z" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5" stroke-linejoin="round"/>
+        <rect x="36" y="54" width="8" height="10" rx="2" fill="#16A34A"/>
+        <rect x="28" y="42" width="6" height="4" rx="1" fill="#fff" opacity="0.6"/>
+        <rect x="46" y="42" width="6" height="4" rx="1" fill="#fff" opacity="0.6"/>
+        <rect x="32" y="50" width="5" height="3" rx="1" fill="#fff" opacity="0.5"/>
+        <rect x="43" y="50" width="5" height="3" rx="1" fill="#fff" opacity="0.5"/>
+      </svg>
+    </div>
+    Canopy
+  </a>
+  <div class="navbar-nav">
+    <a href="/dashboard" class="nav-link"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+    <a href="/upload" class="nav-link active"><i class="ti ti-upload"></i> Upload</a>
+    <a href="/auth/logout" class="nav-link"><i class="ti ti-logout"></i> Logout</a>
+  </div>
+</nav>
+
+<div class="container page">
+  <div style="max-width:600px;margin:0 auto">
+
+    <div class="page-header" style="text-align:center">
+      <h1 class="page-title">Upload a document</h1>
+      <p class="page-subtitle">Canopy will read, understand, and let you chat with it instantly</p>
+    </div>
+
+    <div th:if="${error}" class="alert alert-error">
+      <i class="ti ti-alert-circle"></i>
+      <span th:text="${error}">Error</span>
+    </div>
+
+    <div class="card">
+      <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+
+        <div class="upload-zone" id="uploadZone">
+          <div class="upload-icon"><i class="ti ti-cloud-upload"></i></div>
+          <div class="upload-title">Drop your file here</div>
+          <div class="upload-sub">or click to browse files</div>
+          <div style="margin-top:1rem;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <span class="badge badge-gray"><i class="ti ti-file-type-pdf"></i> PDF</span>
+            <span class="badge badge-blue"><i class="ti ti-file-type-docx"></i> DOCX</span>
+            <span class="badge badge-green"><i class="ti ti-file-text"></i> TXT</span>
+          </div>
+          <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted)">Max file size: 20MB</div>
+          <input type="file" id="fileInput" name="file" accept=".pdf,.docx,.txt" style="display:none" required/>
+        </div>
+
+        <!-- File preview -->
+        <div id="filePreview" style="display:none;align-items:center;gap:12px;padding:12px;background:var(--bg-secondary);border-radius:var(--radius-sm);margin-top:1rem;border:1px solid var(--border)">
+          <i class="ti ti-file" style="font-size:1.5rem;color:var(--green-600)"></i>
+          <div style="flex:1;min-width:0">
+            <div id="fileName" style="font-size:0.875rem;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">filename.pdf</div>
+            <div id="fileSize" style="font-size:0.75rem;color:var(--text-muted)">0 KB</div>
+          </div>
+          <i class="ti ti-check-circle" style="color:var(--green-600);font-size:1.25rem"></i>
+        </div>
+
+        <!-- Progress -->
+        <div id="uploadProgress" style="display:none;margin-top:1rem">
+          <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-bottom:6px">
+            <span>Processing document...</span>
+            <span>This may take 30-60 seconds</span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:100%;animation:progress 2s ease-in-out infinite alternate"></div>
+          </div>
+          <p style="font-size:0.75rem;color:var(--text-muted);text-align:center;margin-top:8px">
+            <i class="ti ti-brain"></i> Canopy is reading, chunking, and embedding your document...
+          </p>
+        </div>
+
+        <button type="submit" id="uploadBtn" class="btn btn-primary w-full" style="justify-content:center;margin-top:1.25rem">
+          <i class="ti ti-rocket"></i> Upload &amp; Process
+        </button>
+      </form>
+    </div>
+
+    <!-- Info cards -->
+    <div class="grid-3" style="margin-top:1.5rem">
+      <div class="card" style="text-align:center;padding:1rem">
+        <i class="ti ti-scissors" style="font-size:1.5rem;color:var(--green-500);margin-bottom:8px;display:block"></i>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--text-primary)">Smart chunking</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">Split into 500-token overlapping chunks</div>
+      </div>
+      <div class="card" style="text-align:center;padding:1rem">
+        <i class="ti ti-vector" style="font-size:1.5rem;color:var(--green-500);margin-bottom:8px;display:block"></i>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--text-primary)">Vector embeddings</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">768-dim Gemini embeddings stored in PGVector</div>
+      </div>
+      <div class="card" style="text-align:center;padding:1rem">
+        <i class="ti ti-sparkles" style="font-size:1.5rem;color:var(--green-500);margin-bottom:8px;display:block"></i>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--text-primary)">Auto summary</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">5-point summary generated instantly on upload</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+@keyframes progress {
+  from { width: 30%; }
+  to { width: 90%; }
+}
+</style>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

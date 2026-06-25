@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — Canopy</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+</head>
+<body>
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <a href="/auth/login" class="auth-logo">
+      <svg width="44" height="44" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="80" height="80" rx="20" fill="#DCFCE7"/>
+        <path d="M22 54 L40 18 L58 54 Z" fill="#BBF7D0" stroke="#16A34A" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M26 46 L40 22 L54 46 Z" fill="#DCFCE7" stroke="#15803D" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M30 38 L40 26 L50 38 Z" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5" stroke-linejoin="round"/>
+        <rect x="36" y="54" width="8" height="10" rx="2" fill="#16A34A"/>
+        <rect x="28" y="42" width="6" height="4" rx="1" fill="#fff" opacity="0.6"/>
+        <rect x="46" y="42" width="6" height="4" rx="1" fill="#fff" opacity="0.6"/>
+        <rect x="32" y="50" width="5" height="3" rx="1" fill="#fff" opacity="0.5"/>
+        <rect x="43" y="50" width="5" height="3" rx="1" fill="#fff" opacity="0.5"/>
+      </svg>
+      <span class="auth-logo-text">Canopy</span>
+    </a>
+
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="auth-sub">Sign in to your Canopy workspace</p>
+
+    <div th:if="${param.registered}" class="alert alert-success">
+      <i class="ti ti-check"></i>
+      Account created successfully! Please sign in.
+    </div>
+
+    <div th:if="${error}" class="alert alert-error">
+      <i class="ti ti-alert-circle"></i>
+      <span th:text="${error}">Error</span>
+    </div>
+
+    <form action="/auth/login" method="post">
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input type="email" name="email" class="form-input" placeholder="you@example.com" required autofocus/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-input" placeholder="Your password" required/>
+      </div>
+      <button type="submit" class="btn btn-primary w-full" style="justify-content:center;margin-top:0.5rem">
+        <i class="ti ti-login"></i> Sign in
+      </button>
+    </form>
+
+    <div class="auth-divider">Don't have an account?</div>
+    <a href="/auth/register" class="btn btn-secondary w-full" style="justify-content:center">
+      Create account
+    </a>
+
+    <p style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin-top:1.5rem">
+      Your documents are private and encrypted.
+    </p>
+  </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

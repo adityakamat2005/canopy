@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — Canopy</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a href="/dashboard" class="navbar-brand">
+    <div class="navbar-logo">
+      <svg width="36" height="36" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="80" height="80" rx="20" fill="#DCFCE7"/>
+        <path d="M22 54 L40 18 L58 54 Z" fill="#BBF7D0" stroke="#16A34A" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M26 46 L40 22 L54 46 Z" fill="#DCFCE7" stroke="#15803D" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M30 38 L40 26 L50 38 Z" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5" stroke-linejoin="round"/>
+        <rect x="36" y="54" width="8" height="10" rx="2" fill="#16A34A"/>
+        <rect x="28" y="42" width="6" height="4" rx="1" fill="#fff" opacity="0.6"/>
+        <rect x="46" y="42" width="6" height="4" rx="1" fill="#fff" opacity="0.6"/>
+        <rect x="32" y="50" width="5" height="3" rx="1" fill="#fff" opacity="0.5"/>
+        <rect x="43" y="50" width="5" height="3" rx="1" fill="#fff" opacity="0.5"/>
+      </svg>
+    </div>
+    Canopy
+  </a>
+  <div class="navbar-nav">
+    <a href="/dashboard" class="nav-link active"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+    <a href="/upload" class="nav-link"><i class="ti ti-upload"></i> Upload</a>
+    <div class="nav-user">
+      <div class="nav-avatar" th:text="${#strings.substring(user.name, 0, 2).toUpperCase()}">AD</div>
+      <span class="nav-name" th:text="${user.name}">Aditya</span>
+      <a href="/auth/logout" class="nav-link btn-sm" style="padding:4px 8px;color:var(--text-muted)">
+        <i class="ti ti-logout"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="container page">
+
+  <!-- Flash messages -->
+  <div th:if="${success}" class="alert alert-success">
+    <i class="ti ti-check"></i>
+    <span th:text="${success}"></span>
+  </div>
+  <div th:if="${error}" class="alert alert-error">
+    <i class="ti ti-alert-circle"></i>
+    <span th:text="${error}"></span>
+  </div>
+
+  <!-- Page header -->
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div>
+      <h1 class="page-title">Good day, <span th:text="${#strings.substringBefore(user.name, ' ')}">Aditya</span> 👋</h1>
+      <p class="page-subtitle">Here's an overview of your document workspace</p>
+    </div>
+    <a href="/upload" class="btn btn-primary">
+      <i class="ti ti-plus"></i> Upload document
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid-3 mb-4" style="margin-bottom:2rem">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="ti ti-files"></i></div>
+      <div>
+        <div class="stat-label">Documents</div>
+        <div class="stat-value" th:text="${totalDocs}">0</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="ti ti-message-circle"></i></div>
+      <div>
+        <div class="stat-label">Questions asked</div>
+        <div class="stat-value" th:text="${totalQuestions}">0</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="ti ti-brain"></i></div>
+      <div>
+        <div class="stat-label">AI answers</div>
+        <div class="stat-value" th:text="${totalDocQuestions}">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documents section -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+    <h2 style="font-size:1.1rem;font-weight:600;color:var(--text-primary)">Your documents</h2>
+    <span class="badge badge-green" th:text="${totalDocs} + ' files'">0 files</span>
+  </div>
+
+  <!-- Empty state -->
+  <div th:if="${#lists.isEmpty(documents)}" class="card">
+    <div class="empty-state">
+      <div class="empty-icon"><i class="ti ti-file-upload"></i></div>
+      <div class="empty-title">No documents yet</div>
+      <div class="empty-sub">Upload a PDF, DOCX, or TXT file to start asking questions</div>
+      <a href="/upload" class="btn btn-primary">
+        <i class="ti ti-upload"></i> Upload your first document
+      </a>
+    </div>
+  </div>
+
+  <!-- Document grid -->
+  <div th:unless="${#lists.isEmpty(documents)}" class="grid-3">
+    <div th:each="doc : ${documents}" class="doc-card">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div class="doc-icon"
+             th:classappend="${doc.fileType == 'PDF'} ? 'doc-icon-pdf' : (${doc.fileType == 'DOCX'} ? 'doc-icon-docx' : 'doc-icon-txt')">
+          <i class="ti"
+             th:classappend="${doc.fileType == 'PDF'} ? 'ti-file-type-pdf' : (${doc.fileType == 'DOCX'} ? 'ti-file-type-docx' : 'ti-file-text')"></i>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="doc-name" th:text="${doc.originalName}">document.pdf</div>
+          <div class="doc-meta">
+            <span th:text="${doc.fileType}">PDF</span>
+            <span>•</span>
+            <span th:text="${doc.chunkCount} + ' chunks'">12 chunks</span>
+            <span>•</span>
+            <span th:text="${doc.questionCount} + ' Q&amp;As'">0 Q&As</span>
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${doc.summary != null}" style="font-size:0.75rem;color:var(--text-muted);line-height:1.5;border-top:1px solid var(--border);padding-top:8px" th:text="${#strings.abbreviate(doc.summary, 120)}">Summary...</div>
+
+      <div style="font-size:0.72rem;color:var(--text-muted)">
+        <i class="ti ti-clock" style="font-size:11px"></i>
+        <span th:text="${#temporals.format(doc.uploadedAt, 'dd MMM yyyy, hh:mm a')}">Jan 1, 2025</span>
+      </div>
+
+      <div class="doc-actions">
+        <a th:href="@{/chat/{id}(id=${doc.id})}" class="btn btn-primary btn-sm" style="flex:1;justify-content:center">
+          <i class="ti ti-message-circle"></i> Chat
+        </a>
+        <form th:action="@{/delete/{id}(id=${doc.id})}" method="post" onsubmit="return confirm('Delete this document?')">
+          <button type="submit" class="btn btn-danger btn-sm">
+            <i class="ti ti-trash"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>
