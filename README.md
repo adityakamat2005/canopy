@@ -153,8 +153,8 @@
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/adityakamat2005/CanopyAI.git
-cd CanopyAI
+git clone https://github.com/adityakamat2005/canopy.git
+cd canopy
 ```
 
 **2. Create the PostgreSQL database**
